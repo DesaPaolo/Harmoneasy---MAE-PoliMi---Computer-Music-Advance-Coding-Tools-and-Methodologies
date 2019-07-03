@@ -1,0 +1,130 @@
+.container {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.time {
+  position: relative;
+  height: 20px;
+  width: 200px;
+  background-color: grey;
+  overflow: hidden;
+
+}
+
+.actualTime {
+  position: absolute;
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
+  background-color: yellow;
+  transform: translateX(-100%);
+  transition: all .5s;
+  animation: updateTime 4s linear forwards;
+}
+
+@keyframes updateTime {
+  0% {transform: translateX(-100%);}
+  100% {transform: translateX(0);}
+}
+
+
+#logarea {
+  overflow:auto;
+  background-color: aliceblue;
+  width: 130vh;
+  height: 100px;
+  border-style: inset;
+  border-width: 2px;
+  border-color: palegoldenrod;
+
+}
+
+#titlediv{
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+}
+
+#subtitle{
+  font-style: italic;
+}
+
+
+#s0{
+  float: left;
+}
+
+#staves{
+
+}
+
+.btn {
+  background-color: Brown;
+  color: white;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: RosyBrown;
+}
+
+#lang{
+  float: right;
+  background-color: gray;
+  border-style: inset;
+  border-width: 2px;
+  border-color: palegoldenrod;
+}
+
+#tonalitylbl{
+  font-size: 20px ;
+}
+
+#chordlbl{
+  font-size: 20px ;
+}
+
+#timer {
+  font-size: 20px ;
+}
+
+#buttons{
+  width: 5vh;
+}
+
+#buttonlabels{
+  width: 30vh;
+  padding-left: 5px;
+}
+
+#switch_caption{
+  width: 120vh;
+  padding-left: 10px;
+}
+
+#top{
+  display: inline-flex;
+  padding-left: 20px
+}
+
+#top-left{
+  width: 31%;
+}
+
+#logo {
+    display: inline-flex;
+}
+
+#bottom {
+  padding-left: 20px;
+}
