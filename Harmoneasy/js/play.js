@@ -11,95 +11,97 @@ var oldNameChord = '';
 
 var names = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
 
-var totscale = new Array();
-
-
+var totscale = new Array();   // Create an array of 97 note number+names from (12; C0) to (108; B8)
 for(var i=0; i<97; i++){
   totscale[i] = [i+12, names[i%12], Math.floor(i/12)];
 }
 
 
-// Create an SVG renderer and attach it to the DIV element named "s1".
-var ext = document.getElementById("s1");
-  var ext0 = document.getElementById("s0");
+// Create an SVG renderer and attach it to the DIV elements
+var ext = document.getElementById("s1");    // S1 contains the main stave
+var ext0 = document.getElementById("s0");   // S0 contains the preview stave
+var renderer = new VF.Renderer(ext, VF.Renderer.Backends.SVG); // main
+var renderer0 = new VF.Renderer(ext0, VF.Renderer.Backends.SVG); // preview
 
-var renderer = new VF.Renderer(ext, VF.Renderer.Backends.SVG);
-  var renderer0 = new VF.Renderer(ext0, VF.Renderer.Backends.SVG);
-
+// Initalization of voice elements in the staff
 var voice = new VF.Voice({num_beats: 4,  beat_value: 4});
 var voice2 = new VF.Voice({num_beats: 4,  beat_value: 4});
-  var prechord = new VF.Voice({num_beats: 1,  beat_value: 4});
-  var prebass = new VF.Voice({num_beats: 1,  beat_value: 4});
 
-// Size our svg:
+// Initialization for notes in the preview staff
+var prechord = new VF.Voice({num_beats: 1,  beat_value: 4});
+var prebass = new VF.Voice({num_beats: 1,  beat_value: 4});
+
+// Reize the svg panel:
 renderer.resize(850, 280);
 renderer0.resize(200,280);
 
-// And get a drawing context:
+// Get a drawing context:
 var context = renderer.getContext();
 var context0 = renderer0.getContext();
 
 var stafflength = 700;
 
-var stave = new VF.Stave(100, 50, stafflength);
-var stave2 = new VF.Stave(100, 160, stafflength);
+// main staff
+var upStave = new VF.Stave(100, 50, stafflength);
+var lowStave = new VF.Stave(100, 160, stafflength);
 
-  var stave0 = new VF.Stave(50, 50, 150);
-  var bass0 = new VF.Stave(50, 160, 150);
+// preview staff
+var upStavePreview = new VF.Stave(50, 50, 150);
+var lowStavePreview = new VF.Stave(50, 160, 150);
 
-var lineRight = new Vex.Flow.StaveConnector(stave, stave2).setType(1); // 1 = thin line
-//var lineLeft = new Vex.Flow.StaveConnector(stave, stave2).setType(6); //bar end
-var brace = new Vex.Flow.StaveConnector(stave, stave2).setType(3); // 3 = brace
-  brace.setContext(context).draw();
+var lineRight = new Vex.Flow.StaveConnector(upStave, lowStave).setType(1); // 1 = thin line
+//var lineLeft = new Vex.Flow.StaveConnector(upStave, lowStave).setType(6); //bar end
+var brace = new Vex.Flow.StaveConnector(upStave, lowStave).setType(3); // 3 = brace
+brace.setContext(context).draw();
 
+var lineRight0 = new Vex.Flow.StaveConnector(upStavePreview, lowStavePreview).setType(1); // 1 = thin line
+//var lineLeft0 = new Vex.Flow.StaveConnector(upStavePreview, lowStavePreview).setType(6); //bar end
+var brace0 = new Vex.Flow.StaveConnector(upStavePreview, lowStavePreview).setType(3); // 3 = brace
+brace0.setContext(context0).draw();
 
-  var lineRight0 = new Vex.Flow.StaveConnector(stave0, bass0).setType(1); // 1 = thin line
-  //var lineLeft0 = new Vex.Flow.StaveConnector(stave0, bass0).setType(6); //bar end
-  var brace0 = new Vex.Flow.StaveConnector(stave0, bass0).setType(3); // 3 = brace
-    brace0.setContext(context0).draw();
+upStave.addClef("treble");
+lowStave.addClef("bass");
+upStavePreview.addClef("treble");
+lowStavePreview.addClef("bass");
 
-stave.addClef("treble");
-stave2.addClef("bass");
-  stave0.addClef("treble");
-  bass0.addClef("bass");
+upStave.setContext(context).draw();
+lowStave.setContext(context).draw();
 
-stave.setContext(context).draw();
-stave2.setContext(context).draw();
-
-  stave0.setContext(context0).draw();
-  bass0.setContext(context0).draw();
+upStavePreview.setContext(context0).draw();
+lowStavePreview.setContext(context0).draw();
 
 lineRight.setContext(context).draw();
 lineRight0.setContext(context0).draw();
+
+// initialize toggle switches
 var toggles = document.querySelectorAll('input[type="checkbox"]');
 
 var arr = [];
-/* arr is a bidimensional array:
+/* arr is a bidimensional array of notes:
         - first dimension refers to the horizontal coordinate (related to the length of the score)
-        - second dimension scans vertically the single chord starting from the bass note
+        - second dimension scans vertically the chords, giving stacked notes starting from the bass one
 */
 
 var errarr = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]];
-/* errarr has a correspondance in position with arr, indicating errors to highlight in staves*/
-var midiarr = new Array(); // stack of old midichords for undo & cantus firmus analysis
+/* errarr is a bidimensional array of color codes:
+        - has a correspondance in position with arr, indicating special notes to be coloured*/
 
-var memarr = new Array(); // stack of old arr for undo operations
-var memerr = new Array(); // stack of old errarr for undo operations
-var memidi = new Array();
+var midiarr = new Array();  // stack of old midichords for undo & cantus firmus analysis
+var memidi = new Array();   // stack of old midichords for undo
+var memarr = new Array();   // stack of old arr for undo operations
+var memerr = new Array();   // stack of old errarr for undo operations
 
-
+// remove all notes from preview staff
 function cleanScore0(){
   if(prechord.getTickables().length){
     prechord.tickables[0].attrs.el.remove();
-
   }
-
   if(prebass.getTickables().length){
     prebass.tickables[0].attrs.el.remove();
-
   }
 }
 
+// remove all notes from main staff
 function cleanScore(){
   if(voice.getTickables().length){
     try{
@@ -120,6 +122,7 @@ function cleanScore(){
   }
 }
 
+// renderer of main staff
 function render() {
 
       cleanScore();
@@ -132,9 +135,8 @@ function render() {
       for(var j=l-1; j>=0; j--){ // for each chord on the sheet
           var chord = arr[l-j-1];
           var ll = chord.length-1;
-          var dx = chord.slice(1,chord.length);
-          var sx = new Array(chord[0]);
-
+          var dx = chord.slice(1,chord.length);   // right hand notes (voices 1,2,3)
+          var sx = new Array(chord[0]);           // left hand notes (voice 0)
 
           bass[4-j-1] = new VF.StaveNote({clef: "bass", keys: sx, duration: "q" });
           if(sx[0][1]=="#")
@@ -171,8 +173,6 @@ function render() {
                 notes[4-j-1].addAccidental(i, new VF.Accidental('#'));
 
               if(errarr[4-j-1]!=undefined && errarr[4-j-1][i+1] != 0){ // painting errors on high voices
-
-
                 switch(errarr[4-j-1][i+1]){
                   case TRI:
                     if(toggles[0].checked)
@@ -203,14 +203,11 @@ function render() {
             notes[4-j-1] = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
           }
 
-
-
-      } // for each rest in the sheet
+      } // for each empty space in arr, draw a rest on the main stave
       for(var j = 3-l; j>=0; j--){
           notes[j] = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
           bass[j]= new VF.StaveNote({clef: "bass", keys: [rest], duration: "qr" });
       }
-
 
     voice = new VF.Voice({num_beats: 4,  beat_value: 4});
     voice2 = new VF.Voice({num_beats: 4,  beat_value: 4});
@@ -222,90 +219,85 @@ function render() {
     var formatter = new VF.Formatter().joinVoices([voice, voice2]).format([voice, voice2], 700);
 
     // Render voice
-    voice.draw(context, stave);
-    voice2.draw(context, stave2);
+    voice.draw(context, upStave);
+    voice2.draw(context, lowStave);
 }
 
 
 function render0() {
 
-      cleanScore0();
-      if(renderChord.length < 1)
-        return;
-      chord = buildChord(renderChord);
-      //console.log(chord);
+  cleanScore0();
+  if(renderChord.length < 1)
+    return;
+  chord = buildChord(renderChord);
 
+  var notes = new Array();
+  var bass = new Array();
 
-      var notes = new Array();
-      var bass = new Array();
+  var ll = chord.length-1;
+  var dx = chord.slice(1,chord.length);
+  var sx = new Array(chord[0]);
 
-          var ll = chord.length-1;
-          var dx = chord.slice(1,chord.length);//modificato
-          var sx = new Array(chord[0]);
+  bass[0] = new VF.StaveNote({clef: "bass", keys: sx, duration: "q" });
+  if(sx[0][1]=="#")
+    bass[0].addAccidental(0, new VF.Accidental('#'));
 
-          bass[0] = new VF.StaveNote({clef: "bass", keys: sx, duration: "q" });
-          if(sx[0][1]=="#")
-            bass[0].addAccidental(0, new VF.Accidental('#'));
+  if(dx.length){
+    notes[0] = new VF.StaveNote({clef: "treble", keys: dx, duration: "q" });
+    //console.log(notes);
+    for(var i=0; i<dx.length; i++){
+      if(dx[i][1]=="#")
+        notes[0].addAccidental(i, new VF.Accidental('#'));
+    }
+  }
+  else
+  {
+    notes[0] = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
+  }
 
-          if(dx.length){
-            notes[0] = new VF.StaveNote({clef: "treble", keys: dx, duration: "q" });
-            //console.log(notes);
-            for(var i=0; i<dx.length; i++){
-              if(dx[i][1]=="#")
-                notes[0].addAccidental(i, new VF.Accidental('#'));
-            }
-          }
-          else
-          {
-            notes[0] = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
-          }
+  //notes = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
+  //bass = new VF.StaveNote({clef: "bass", keys: [rest], duration: "qr" });
 
-          //notes = new VF.StaveNote({clef: "treble", keys: [rest], duration: "qr" });
-          //bass = new VF.StaveNote({clef: "bass", keys: [rest], duration: "qr" });
+  prechord = new VF.Voice({num_beats: 1,  beat_value: 4});
+  prebass = new VF.Voice({num_beats: 1,  beat_value: 4});
 
-    prechord = new VF.Voice({num_beats: 1,  beat_value: 4});
-    prebass = new VF.Voice({num_beats: 1,  beat_value: 4});
+  prechord.addTickables(notes);
+  prebass.addTickables(bass);
 
+  // Format and justify the notes in the stave
+  var formatter = new VF.Formatter().joinVoices([prechord, prebass]).format([prechord, prebass], 700);
 
-    prechord.addTickables(notes);
-    prebass.addTickables(bass);
-
-    // Format and justify the notes to pixels.
-    var formatter = new VF.Formatter().joinVoices([prechord, prebass]).format([prechord, prebass], 700);
-
-    // Render voice
-    prechord.draw(context0, stave0);
-    prebass.draw(context0, bass0);
+  // Render voice
+  prechord.draw(context0, upStavePreview);
+  prebass.draw(context0, lowStavePreview);
 }
 
-function add(b){ // b must be an array of length>0 containing midinotes
+function add(newChord){ // b must be an array of length>0 containing midinotes
   var errnew = [0,0,0,0];
   if(midiarr.length>=scorelength)
   	midiarr.shift();
-  midiarr.push([...b]); // '...' operator to pass by copy
-  if(old!=-1){
-    errnew = (motionAnalysis(b, old, tonality, oldNameChord));
-  if (toggles[4].checked)
-    	errnew = cantusFirmus(errnew);
+  midiarr.push([...newChord]); // push a copy of the new chord in midiarr
+  if(old!=-1){  // if not the first chord
+    errnew = (motionAnalysis(newChord, old, tonality, oldNameChord));   // compute motion analysis on the last two chords
+  if (toggles[4].checked)   // if melodic analysis is enabled
+    	errnew = cantusFirmus(errnew); // compute further analysis on the treble voice
   }
-
 
   //if(midiarr.length>=scorelength)
   errarr.shift();
   errarr.push(errnew);
 
-
-  old = b.slice(0,b.length);
+  old = newChord.slice(0,newChord.length);
   oldNameChord=nameChord;
 
-  b = buildChord(b);
+  newChord = buildChord(newChord);
 	if(arr.length>=scorelength){
 	  arr.shift(); // delete first chord and shift
       memarr.push(arr[0]);
       memerr.push(errarr[0]);
       memidi.push(midiarr[0]);
     }
-  	arr.push(b); 		// push new chord
+  	arr.push(newChord); 		// push new chord
     render();
 }
 
@@ -400,10 +392,12 @@ function cantusFirmus(errnew){
 	return errnew;
 }
 
+// MIDI note number to note name conversion
 function midiToNote(n){
 	return [totscale[n][1]+"/"+totscale[n][2]];
 }
 
+// sort the notes from bass to treble
 function buildChord(midichord){
 	midichord.sort(sortNumber);
 	var out = new Array();
@@ -412,10 +406,11 @@ function buildChord(midichord){
 		out = out.concat(midiToNote(midichord[j]));
 
 	return out;
-
 }
 
+// remove the last chord from staff
 function undo(){
+  // remove last entry of the processing array
   arr.pop();
   errarr.pop();
 
@@ -454,5 +449,6 @@ function undo(){
 function updateNameChord(n){
   nameChord = n;
 }
+
 //document.body.addEventListener("load", function(){changeLang(true)});
 document.getElementById("lang").addEventListener("click", function(){changeLang('0')});

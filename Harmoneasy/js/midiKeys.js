@@ -10,7 +10,7 @@ var buttonPressed = [];
 
 //onkeydown
 document.addEventListener("keydown", function(e){
-  if(buttonPressed.indexOf(e.key) == -1){ //keydown of a key not pressed
+  if(buttonPressed.indexOf(e.key) == -1){ //keydown of a key not yet pressed
     if(!e.repeat){
       var i = 0;
       var bass = false;
@@ -54,7 +54,7 @@ document.addEventListener("keyup", function(e){
     if(x!=-1){
       noteOff(bassNotes[x]);
     } else {
-      console.log("keyup of a button not pressed...what!?")
+      // console.log("keyup of a button not pressed...what!?")
     }
   }
 

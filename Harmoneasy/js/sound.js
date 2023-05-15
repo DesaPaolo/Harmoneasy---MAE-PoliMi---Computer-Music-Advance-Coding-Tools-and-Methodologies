@@ -5,7 +5,6 @@
  var oscillators = [];
  var gains = [];
 
-
 function attack(midiNote) {
   var freq  = frequencyFromNoteNumber(midiNote);
   var osc = con.createOscillator();
@@ -34,8 +33,6 @@ function release() {
     gains = [];
     oscillators = [];
   }
-
-
 
 function frequencyFromNoteNumber(note) {
     return 440 * Math.pow(2, (note - 69) / 12);

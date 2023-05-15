@@ -9,7 +9,7 @@ function startTimer(){
       stopTimer(timer);
     else if (millisec < 0) {
       console.log("TIME OUT");
-      detectTonality(); //!!!!!!!! Before add() cause inside detectTonality() there are checks on arr
+      detectTonality();
       plotTonality();
 
       if(renderChord.length!=0){
