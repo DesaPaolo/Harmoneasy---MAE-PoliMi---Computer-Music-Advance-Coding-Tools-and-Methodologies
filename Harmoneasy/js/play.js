@@ -91,6 +91,8 @@ var memidi = new Array();   // stack of old midichords for undo
 var memarr = new Array();   // stack of old arr for undo operations
 var memerr = new Array();   // stack of old errarr for undo operations
 
+
+
 // remove all notes from preview staff
 function cleanScore0(){
   if(prechord.getTickables().length){
@@ -223,7 +225,7 @@ function render() {
     voice2.draw(context, lowStave);
 }
 
-
+// renderer of left staff
 function render0() {
 
   cleanScore0();

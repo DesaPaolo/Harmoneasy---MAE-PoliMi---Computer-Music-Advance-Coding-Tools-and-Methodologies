@@ -2,7 +2,9 @@
 var tempChord =[];
 var renderChord = [];
 var doubledVoice = [];
+var nameChord = ""; // use in tonalityDetection
 
+//
 function recursiveMidiNoteDetection(midiNote){
   if(tempChord.length==0){
     return midiNote;
@@ -27,38 +29,13 @@ function noteOn(midiNote) {
   //console.log("renderChord = " + renderChord);
   render0(renderChord);
 
-  //creation of tempChord
+  //creation of tempChord (e.g. [60, 64, 67])
   tempChord.push(recursiveMidiNoteDetection(midiNote));
-  //iteratively
-  /*if(tempChord.length==0){
-    tempChord.push(midiNote);
-  } else {
-    if(midiNote > Math.min.apply(null,tempChord)) {
-      if(midiNote >= Math.min.apply(null,tempChord)+12){
-        while(true){
-          if(midiNote < Math.min.apply(null,tempChord)+12) {
-            break;
-          } else {
-            midiNote = midiNote - 12;
-          }
-        }
-      }
-    } else {
-      if(midiNote <= Math.min.apply(null,tempChord)-12){
-        while(true){
-          if(midiNote > Math.min.apply(null,tempChord)-12) {
-            break;
-          } else {
-            midiNote = midiNote + 12;
-          }
-        }
-      }
-    }
-    tempChord.push(midiNote);
-  }*/
+
   //check for doubling voices!!
   for (var i = 0; i<tempChord.length; i++){
     for(var j = 0; j<tempChord.length; j++){
+      // if a note is repeated in same octave or other octave
       if(i!=j && (tempChord[i]==tempChord[j] || Math.abs(tempChord[i] - tempChord[j])%12==0)){
         //console.log("Doubled voice!");
         if(tempChord[i]>tempChord[j]) {
@@ -66,7 +43,7 @@ function noteOn(midiNote) {
           tempChord.splice(i, 1); //remove the doubled voice from tempChord (higher one)
         } else if (tempChord[i]<tempChord[j]) {
           doubledVoice.push(tempChord[j]);
-          tempChord.splice(j, 1);
+          tempChord.splice(j, 1); //remove the doubled voice from tempChord (higher one)
         } else { //tempChord[i]==tempChord[j]
           doubledVoice.push(tempChord[i]);
           tempChord.splice(i, 1);
@@ -75,6 +52,7 @@ function noteOn(midiNote) {
     }
   }
   var bass = Math.min.apply(null,tempChord);
+  // bring chord notes in the same octave as bass
   for (var i = 0; i < tempChord.length; i++){ // [e, c, g] -> [e, g, c]
     if(tempChord[i]-bass > 12){
       while(true){
@@ -92,31 +70,7 @@ function noteOn(midiNote) {
 
   detectChord(tempChord);
   //console.log("nameChord: " + nameChord);
-
-
-  /*var temp =0;     //check of doubling voice
-  var isDoubled = false;
-  for(var i = 0; i<tempChord.length; i++){
-    temp = Math.abs(midiNote - tempChord[i]);
-    if(temp == 12){ //if new note is a doubling
-      //console.log("doubling of voice")
-      isDoubled=true;
-      break;
-    }
-  }
-  if(!isDoubled){
-    tempChord.push(midiNote);
-    tempChord.sort(sortNumber);
-  } else {
-    doubledVoice.push(midiNote);
-  }
-  //console.log("tempChord = " + tempChord);
-
-  detectChord(tempChord);
-  //console.log("nameChord: " + nameChord);*/
 }
-
-var nameChord = ""; //global because tonalityDetaction need it
 
 function detectChord(chord){
   var tempChordInterval=[];
@@ -124,8 +78,13 @@ function detectChord(chord){
     tempChordInterval.push(chord[i] - chord[i-1]); //[60, 64, 63] -> [4, 3]
   }
 
-  if(chord.length>1)
+
+  // length is 2 for bichord
+  if(chord.length==2){
+    plotNameChord(Chords.getName(tempChordInterval, chord));
+  }else if(chord.length>2){
     plotNameChord(Chords.getName(JSON.stringify(tempChordInterval), chord));
+  }
 
 }
 
@@ -148,6 +107,7 @@ function noteOff(midiNote) {
   }
 
   var j = renderChord.indexOf(midiNote);
+  // remove j-th element
   renderChord.splice(j, 1);
   //console.log("renderChord = " + renderChord);
   render0(renderChord);
@@ -155,6 +115,7 @@ function noteOff(midiNote) {
   var tempChordNote = [];
   var doubledVoiceNote = [];
   var note;
+  // extract the note letter from the midi note number
   for (var i = 0; i<tempChord.length; i++) {
     note = midiToNote(tempChord[i]);
     note= note.toString();
