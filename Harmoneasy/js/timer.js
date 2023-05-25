@@ -8,12 +8,12 @@ function startTimer(){
     if(tempChord.length==0 || renderChord.length==0)
       stopTimer(timer);
     else if (millisec < 0) {
-      console.log("TIME OUT");
+//      console.log("TIME OUT");
       detectTonality();
       plotTonality();
 
-      if(renderChord.length!=0){
-        add(renderChord);}
+      if(renderChord.length!=0)
+        add(renderChord);
 
       stopTimer(timer);
 

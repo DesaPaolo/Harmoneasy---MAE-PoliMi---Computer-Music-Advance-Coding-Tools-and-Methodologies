@@ -49,6 +49,14 @@ var alteredNotes = [];
 var isModulating=false;
 
 function detectTonality(){
+
+  var tempChordInterval = [];
+  for(var i = 1; i<tempChord.length; i++){
+    tempChordInterval.push(tempChord[i] - tempChord[i-1]); //[60, 64, 63] -> [4, 3]
+  }
+
+  console.log("inter: "+tempChordInterval);
+
   if (arr.length==0 || tonality == ""){ //first chord (or tonality still not detected)
 
     if(nameChord.includes("major ") && !nameChord.includes("6")){ // avoid major6 chords
@@ -97,7 +105,7 @@ function detectTonality(){
                                                                                //avoid minor with 6 and relative ambiguity with minor5b
         major=false;
 
-        var temp ="";       // to resolve the superposition of root and second riv in minor triad/major 6 no 5
+        let temp ="";       // to resolve the superposition of root and second riv in minor triad/major 6 no 5
         if (nameChord.includes("/"))
           temp = nameChord.slice(0, nameChord.indexOf('/'));
         else
@@ -146,7 +154,7 @@ function detectTonality(){
   } else { // not first chord
     if (!(isSameTonality(tonalityIndex))){ // new chord has a note out of tonality
 
-      var chord = "";      //discard the ambiguities
+      let chord = "";      //discard the ambiguities
       if (nameChord.includes("/"))
         chord = nameChord.slice(0, nameChord.indexOf('/'));
       else
@@ -204,9 +212,9 @@ function detectTonality(){
 
           major=true;
           isModulating = true;
-          var sharp=1;
-          var flat = 1;
-          var temp=0;
+          let sharp=1;
+          let flat = 1;
+          let temp=0;
 
           for (var i=0; i<6; i++){
 
@@ -254,8 +262,8 @@ function detectTonality(){
 function isSameTonality(tonalMatIndex){
   alteredNotes = [];
   var isAltered = false;
-  for (var i=0; i<tempChord.length; i++ ){
-    var note = midiToNote(tempChord[i]);
+  for (let i=0; i<tempChord.length; i++ ){
+    let note = midiToNote(tempChord[i]);
     note = note.toString();
     note=note.slice(0, note.indexOf('/')); // remove reference to the octave 'c/5' -> 'c'
     if (tonalMat[tonalMatIndex][names.indexOf(note)]!=1){ //the tempChord note isn't in the tonality(veramente fiero di questa linea di codice)

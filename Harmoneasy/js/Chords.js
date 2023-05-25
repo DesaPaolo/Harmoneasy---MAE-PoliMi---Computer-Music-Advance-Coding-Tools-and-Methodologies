@@ -73,15 +73,15 @@ class Chords{
     let chordField = Chords.chordTable[chordIntervals];
     if(chordField == undefined)
       return '';
-    let lang = 1;
+    //let lang = 1;
     let chordName = '_';
     //console.log(chord);
     if(typeof(chordField[0]) == 'number'){
-      chordName = notes[chord[chordField[0]]%12] + chordField[lang];
+      chordName = notes[chord[chordField[0]]%12] + chordField[lang+1];
     }
     else if(typeof(chordField[0]) == 'object'){
-      chordName = notes[chord[chordField[0][0]]%12] + chordField[0][lang]
-       + ' / ' +  notes[chord[chordField[1][0]]%12] + chordField[1][lang];
+      chordName = notes[chord[chordField[0][0]]%12] + chordField[0][lang+1]
+       + ' / ' +  notes[chord[chordField[1][0]]%12] + chordField[1][lang+1];
     }else{
       // errore
     }

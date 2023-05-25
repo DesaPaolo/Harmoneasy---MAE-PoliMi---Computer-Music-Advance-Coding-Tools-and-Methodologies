@@ -78,7 +78,6 @@ function detectChord(chord){
     tempChordInterval.push(chord[i] - chord[i-1]); //[60, 64, 63] -> [4, 3]
   }
 
-
   // length is 2 for bichord
   if(chord.length==2){
     plotNameChord(Chords.getName(tempChordInterval, chord));

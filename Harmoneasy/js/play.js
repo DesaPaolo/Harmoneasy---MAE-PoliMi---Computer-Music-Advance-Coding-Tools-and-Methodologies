@@ -1,8 +1,8 @@
 var VF =Vex.Flow;
-var mc = "c/5";
-var rest = "b/4";
-var scorelength = 4;
-var tonality = 0;
+// var mc = "c/5";       // middle c
+var rest = "b/4";     // sets the vertical position of the rest symbol on the score
+var scorelength = 4;  // sets the amount of entries on the main score (rests+chords)
+var tonality = 0; 
 var old = -1;
 var nameChord = '';
 var oldNameChord = '';
@@ -11,7 +11,8 @@ var oldNameChord = '';
 
 var names = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
 
-var totscale = new Array();   // Create an array of 97 note number+names from (12; C0) to (108; B8)
+var totscale = new Array();
+// Create an array of 97 note number+names from (12; C0) to (108; B8)
 for(var i=0; i<97; i++){
   totscale[i] = [i+12, names[i%12], Math.floor(i/12)];
 }
@@ -394,9 +395,9 @@ function cantusFirmus(errnew){
 	return errnew;
 }
 
-// MIDI note number to note name conversion
+// MIDI note number to note name conversion (e.g. 72 -> C/5)
 function midiToNote(n){
-	return [totscale[n][1]+"/"+totscale[n][2]];
+	return [totscale[n-12][1]+"/"+totscale[n-12][2]];
 }
 
 // sort the notes from bass to treble

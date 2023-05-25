@@ -11,8 +11,8 @@ function sortNumber(a,b) {
 var lang = 0;
 
 // ERRORS
-TRI = "blue";
-PAR = "brown";
-CF = "green";
-RES = "pink"; //leading tone resolution
-SEV = "red";  //seventh resolution
+TRI = "Red";
+PAR = "Blue";
+CF = "DarkCyan";
+RES = "Magenta"; //leading tone resolution
+SEV = "ForestGreen";  //seventh resolution
