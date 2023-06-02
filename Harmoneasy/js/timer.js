@@ -9,7 +9,8 @@ function startTimer(){
       stopTimer(timer);
     else if (millisec < 0) {
 //      console.log("TIME OUT");
-      detectTonality();
+      // detectTonality();
+      newTonalityDetection();
       plotTonality();
 
       if(renderChord.length!=0)

@@ -397,7 +397,11 @@ function cantusFirmus(errnew){
 
 // MIDI note number to note name conversion (e.g. 72 -> C/5)
 function midiToNote(n){
-	return [totscale[n-12][1]+"/"+totscale[n-12][2]];
+  try{
+	 return [totscale[n-12][1]+"/"+totscale[n-12][2]];
+  }catch(err){
+    console.log("Handled error in solving notenumber: "+n)
+  }
 }
 
 // sort the notes from bass to treble
@@ -449,9 +453,9 @@ function undo(){
   render();
 }
 
-function updateNameChord(n){
-  nameChord = n;
-}
+// function updateNameChord(n){
+//   nameChord = n;
+// }
 
 //document.body.addEventListener("load", function(){changeLang(true)});
 document.getElementById("lang").addEventListener("click", function(){changeLang('0')});

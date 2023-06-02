@@ -1,18 +1,5 @@
-/*                 C D E F G A B
-Cmajor				    [0,0,0,0,0,0,0, //sharp
-Gmajor				     0,0,0,1,0,0,0,
-D						       1,0,0,1,0,0,0,
-A						       1,0,0,1,1,0,0,
-E						       1,1,0,1,1,0,0,
-B/Cb					     1,1,0,1,1,1,0, // 1,1,1,1,1,1,1 (flat)
-F#/Gb					     1,1,1,1,1,1,0, // 1,1,1,0,1,1,1
-C#major/DbMajor		 1,1,1,1,1,1,1, // 0,1,1,0,1,1,1
-Ab						     0,1,1,0,0,1,1, //flat
-Eb						     0,0,1,0,0,1,1,
-Bb					       0,0,1,0,0,0,1,
-F						       0,0,0,0,0,0,1,]
-major scale [2,2,1,2,2,2,1]*/
 
+// table of diatonic tonalities
 tonalMat = [
 //[C,#,D,#,E,F,#,G,#,A,#,B] C
   [1,0,1,0,1,1,0,1,0,1,0,1],
@@ -261,22 +248,16 @@ function detectTonality(){
 
 function isSameTonality(tonalMatIndex){
   alteredNotes = [];
-  var isAltered = false;
   for (let i=0; i<tempChord.length; i++ ){
     let note = midiToNote(tempChord[i]);
     note = note.toString();
     note=note.slice(0, note.indexOf('/')); // remove reference to the octave 'c/5' -> 'c'
     if (tonalMat[tonalMatIndex][names.indexOf(note)]!=1){ //the tempChord note isn't in the tonality(veramente fiero di questa linea di codice)
       alteredNotes.push(names.indexOf(note));
-      isAltered = true;
-      break;
+      return false;
     }
   }
-
-  if (isAltered)
-    return false;
-  else
-    return true;
+  return true;
 }
 
 function isLeadingTone(note){ //note -> index of the note in names
