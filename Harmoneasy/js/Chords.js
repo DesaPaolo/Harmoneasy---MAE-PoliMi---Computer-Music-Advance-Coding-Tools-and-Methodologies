@@ -228,6 +228,8 @@ class Chords{
 
   static getRoot(intervals, chord){
     i = Chords.chordTable[JSON.stringify(intervals)][0]
+    if(Array.isArray(i))
+      i = i[0];
     return midiToNote(chord[i]);
   }
 

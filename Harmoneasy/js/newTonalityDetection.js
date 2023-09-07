@@ -1,8 +1,10 @@
 function newTonalityDetection(){
 
+  // ignore bichords
   if(tempChord.length < 2)
     return;
 
+  // convert MIDI-notes to intervallic structure
   var tempChordInterval = [];
   for(var i = 1; i<tempChord.length; i++){
     tempChordInterval.push(tempChord[i] - tempChord[i-1]); //[60, 64, 63] -> [4, 3]
@@ -14,10 +16,18 @@ function newTonalityDetection(){
   let diatonic = false;
 
   if (arr.length==0 || tonality == ""){ //first chord (or tonality still not detected)
+
+    console.log("TD: First chord");
+
     if(Chords.isDiatonic(intervals)){
+
+      console.log("\tTD: Diatonic chord");
 
       // minor chord has two interpretations (see Chords.js)
       if(Chords.isMinor(intervals)){
+
+        console.log("\t\tTD: Minor chord");
+
         // as a first chord, we assume the minor is naming the tonality over the 6th chord
         rootPos = Chords.chordTable[intervals][0][0];
         tonality = midiToNote(tempChord[rootPos])[0];
@@ -28,18 +38,33 @@ function newTonalityDetection(){
       // all other diatonic chords have a clear root, except the suspended for which we don't make assumptions about tonality
       else
       {
+
+        console.log("\t\tTD: Non-minor chord");
+
         rootPos = Chords.chordTable[intervals][0];
+        if(Array.isArray(rootPos))
+          rootPos = rootPos[0];
         if(Chords.isDominant(intervals))
+        {
+          console.log("\t\t\tTD: Dominant chord");
           tonality = midiToNote(tempChord[rootPos]-7)[0];  // resolving one fifth below root
-        else if(Chords.isSemidim(intervals))
+        }
+        else if(Chords.isSemidim(intervals)){
+          console.log("\t\t\tTD: Semidim chord");
           tonality = midiToNote(tempChord[rootPos]+1)[0];  // resolving a semitone above root
+        }
         else
+        {
+          console.log("\t\t\tTD: By exclusion, major chord");
           tonality = midiToNote(tempChord[rootPos])[0];    // major tonality
+        }
         tonality = tonality.slice(0, tonality.indexOf('/')); // remove reference to the octave 'c/5' -> 'c'
       }
     }
+    // if non diatonic
     else if(Chords.isMinorMaj7(intervals))
     {
+      console.log("\tTD: MinorMaj7 chord");
       major = false;
       rootPos = Chords.chordTable[intervals][0];
       tonality = midiToNote(tempChord[rootPos][0]);
@@ -48,6 +73,7 @@ function newTonalityDetection(){
     }
     else if(Chords.isAugmented(intervals))
     {
+      console.log("\tTD: Augmented chord");
       major = false;
       rootPos = Chords.chordTable[intervals][0];
       tonality = midiToNote(tempChord[rootPos]-3)[0];
@@ -70,14 +96,22 @@ function newTonalityDetection(){
     }
 
   } else { // not first chord
+
+    console.log("TD: Not first chord");
+
     if (!(isSameTonality(tonalityIndex))){ // new chord has a note out of tonality
+
+      console.log("\tTD: New tonality");
 
       // Minor cadence
       // e.g. C-E-Aminor => A minor, not A major
       // avoid minor 7 (II) but allow minor 7maj
       if(isModulating && Chords.isMinor(intervals) && Chords.getRoot(tempChordInterval, tempChord)==tonality){ 
+
+        console.log("\t\tTD: Minor cadence");
+
         major = false;
-        rootPos = Chords.chordTable[intervals][0];
+        rootPos = Chords.chordTable[intervals][0][0];
         tonality = midiToNote(tempChord[rootPos])[0];    // minor or major tonality
         tonality = tonality.slice(0, tonality.indexOf('/')); // remove reference to the octave 'c/5' -> 'c'
         tonality = tonality + " minor";
@@ -89,19 +123,32 @@ function newTonalityDetection(){
         }
         isModulating=false;
       } else {
+
+        console.log("\t\tTD: Not minor cadence");
+
         if(Chords.isAugmented(intervals)){ // third grade of melodic minor scale -> modulation major-minor
                                            // not included in tonalMat
+          
+          console.log("\t\t\tTD: Modulating augmented");
+
           major = false;
           rootPos = Chords.chordTable[intervals][0];
+          if(Array.isArray(rootPos))
+            rootPos = rootPos[0];
           tonality = midiToNote(tempChord[rootPos]-3)[0];
           tonality=tonality.slice(0, tonality.indexOf('/')); // remove reference to the octave 'c/5' -> 'c'
           tonality = tonality + " minor (harmonic/melodic)";
 
         } else if(Chords.isDiminished(intervals)) {
+
+          console.log("\t\t\tTD: Modulating diminished");
+
           tonality = "diminished";
           major = false;
         } else { // notewise identification of tonality
+
           console.log("notewise identification of tonality");
+
           isModulating = true;
           let sharp=1;
           let flat = 1;
@@ -131,7 +178,12 @@ function newTonalityDetection(){
 
     } else { // no notes out of tonality
 
+      console.log("\tTD: same tonality");
+
       if(!major && isRelativeMajorDominant(tempChord, intervals)){ // a - G (7) - C -> C major not A minor
+
+        console.log("\t\tTD: RelativeMajorDominant");
+
         //tonality = relative major
         major = true;
         isModulating = true;
@@ -143,10 +195,17 @@ function newTonalityDetection(){
         //tonalityIndex is the same!!!
       }
 
+      try{
       //C - E - A -> A major not A major/minor (tonic of the new tonality)
-      if(isModulating && Chords.getRoot(tempChordInterval, tempChord)==tonality)
-        isModulating=false;
-
+        if(isModulating && Chords.getRoot(tempChordInterval, tempChord)==tonality){
+          console.log("\t\tTD: RelativeMajorModulation");
+          isModulating=false;
+        }
+      } catch {
+        console.log("ECCEZIONE");
+        console.log(tempChordInterval);
+        console.log(tempChord);
+      }
     }
   }
 }
@@ -159,6 +218,9 @@ function isRelativeMajorDominant(tempChord, intervals){
   }
   console.log(dominantIndex);
   try{
+    if(Array.isArray(Chords.chordTable[intervals][0]))
+      rootPos = Chords.chordTable[intervals][0][0];
+    else
     rootPos = Chords.chordTable[intervals][0];
   }catch(err){
     console.log("Intervals giving error: "+intervals)
