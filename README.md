@@ -1,3 +1,8 @@
+## Bugfix in progress
+
+Minor cadence (V -> i)
+
+
 # Harmoneasy - Harmony made easy, web application
 
 HARMONEASY is an user friendly and intuitive web application finalized to the music learning growth of the harmony student.
