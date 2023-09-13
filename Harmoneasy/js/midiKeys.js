@@ -28,8 +28,7 @@ document.addEventListener("keydown", function(e){
         //fix bug about onkeydown event
         console.log("errore");
       } else if(e.key==" "){
-//        detectTonality();
-        newTonalityDetection();
+        detectTonality();
         plotTonality();
         add(renderChord);
       } else {

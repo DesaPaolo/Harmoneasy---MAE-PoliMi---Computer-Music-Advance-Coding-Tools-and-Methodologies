@@ -2,10 +2,10 @@ class Chords{
 
   static chordTable = {
     // bichords
-    '7': [0, '5', '5'],
-    '4': [0, '3M', '3M'],
-    '3': [0, '3m', '3m'],
-    '5': [0, '4', '4'],
+    '[7]': [0, '5', '5'],
+    '[4]': [0, '3M', '3M'],
+    '[3]': [0, '3m', '3m'],
+    '[5]': [0, '4', '4'],
 
     // triads
     '[4,3]' : [0, ' major', ' maggiore'],
@@ -49,9 +49,9 @@ class Chords{
     '[3,2,3]' : [2, 'm7 2nd inv', 'm7 2° riv'],
     '[2,3,4]' : [1, 'm7 3rd inv', 'm7 3° riv'],
     '[4,3,4]' : [0, 'm7', 'm7'],
-    '[3,4,1]' : [3, ' maj7 1st inv', ' maj7 1° riv'],
-    '[4,1,4]' : [2, ' maj7 2nd inv', ' maj7 2° riv'],
-    '[1,4,3]' : [1, ' maj7 3rd inv', ' maj7 3° riv'],
+    '[3,4,1]' : [3, 'maj7 1st inv', 'maj7 1° riv'],
+    '[4,1,4]' : [2, 'maj7 2nd inv', 'maj7 2° riv'],
+    '[1,4,3]' : [1, 'maj7 3rd inv', 'maj7 3° riv'],
     '[4,3,3]' : [0, '7', '7'],
     '[3,3,2]' : [3, '7 1st inv', '7 1° riv'],
     '[3,2,4]' : [2, '7 2nd inv', '7 2° riv'],
@@ -90,7 +90,8 @@ class Chords{
   }
 
   static isChord(chord){
-    // chord = JSON.stringify(chord);
+    if(Array.isArray(chord))
+      chord = JSON.stringify(chord);
     if(Chords.chordTable[chord])
       return true;
     else
@@ -158,7 +159,6 @@ class Chords{
     if(!Chords.isChord(chord) || Chords.isMinorMaj7(chord) || Chords.isDiminished(chord))
       return false;
 
-    // chord = JSON.stringify(chord);
     if(chord === '[4,4]')
       return false;
     else
@@ -174,6 +174,20 @@ class Chords{
       return false;
 
     return true;
+  }
+
+  static isMajorMaj7(chord){
+
+    try{
+      if(Chords.chordTable[chord][1].indexOf("maj7") == 0)
+        return true;
+    }
+    catch{
+      return false;
+    }
+
+    return false;
+
   }
 
   static isDominant(chord){
@@ -226,7 +240,23 @@ class Chords{
       return false;
   }
 
+  static isMinorSharp6(chord){
+    return false;
+  }
+
+  static isMajorSharp4(chord){
+    return false;
+  }
+
+  static isMinorFlat2(chord){
+    return false;
+  }
+
   static getRoot(intervals, chord){
+    if(!Chords.isChord(intervals))
+      return false;
+
+    // i is the index of the root in the chord
     i = Chords.chordTable[JSON.stringify(intervals)][0]
     if(Array.isArray(i))
       i = i[0];
