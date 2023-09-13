@@ -1,7 +1,5 @@
 ## Bugfix in progress
 
-Minor cadence (V -> i)
-
 
 # Harmoneasy - Harmony made easy, web application
 
